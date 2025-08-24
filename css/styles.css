@@ -176,7 +176,7 @@ body {
   background:rgba(255,255,255,.85); 
   border-radius:14px; 
   padding:10px 14px;
-  margin:4px 0 0; 
+  margin:260px 0 0; 
   animation: subtleGlow 2s ease-in-out infinite alternate;
 }
 #celebrate-message{
@@ -352,4 +352,42 @@ body {
   opacity:0;
   transform: translateY(-6px) scale(.98);
   transition: opacity .35s ease, transform .35s ease;
+}
+
+/* iPhone-ish widths (≤ 430px) */
+@media (max-width: 430px){
+  /* slightly smaller title blocks + gentler left shift */
+  .title-stack,
+  .title-stack2,
+  .title-stack3{
+    width: 50%;           /* was 54% */
+  }
+
+  .title-stack{           /* "HAPPY" */
+    top: 6%;              /* was 4% */
+    left: 50%;
+    transform: translateX(-56%);   /* was -65% */
+  }
+  .title-stack2{          /* "BIRTH" */
+    top: 12%;             /* was 15% */
+    left: 50%;
+    transform: translateX(-46%);   /* was -40% */
+  }
+  .title-stack3{          /* "DAY" */
+    top: 18%;             /* was 20% */
+    left: 50%;
+    transform: translateX(-36%);   /* was -20% */
+  }
+}
+
+/* Very narrow phones (≤ 375px, e.g., iPhone SE) */
+@media (max-width: 375px){
+  .title-stack,
+  .title-stack2,
+  .title-stack3{
+    width: 46%;
+  }
+  .title-stack{ top: 6%;  transform: translateX(-54%); }
+  .title-stack2{ top: 12%; transform: translateX(-44%); }
+  .title-stack3{ top: 18%; transform: translateX(-34%); }
 }
