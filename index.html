@@ -1,0 +1,105 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+  <title>Happy Birthday 🎈</title>
+  <link rel="preload" href="audio/birthday.mp3" as="audio">
+  <link rel="preload" href="img/Background.png" as="image">
+  <link rel="preload" href="img/ballon.png" as="image">
+  <link rel="preload" href="img/Anosa.png" as="image">
+  <link rel="preload" href="img/cake4.png" as="image">
+  <link rel="stylesheet" href="css/styles.css" />
+</head>
+<body>
+
+  <!-- one-time tap overlay (unlocks audio/mic on iOS, starts animations) -->
+  <button id="startOverlay" class="overlay">
+    <div class="overlay-inner">
+      <div class="emoji">🎧🎤🎈</div>
+      <div class="headline">Tap to start the surprise</div>
+      <div class="sub">we’ll play music & let you blow the candle 🎂</div>
+    </div>
+  </button>
+
+  <!-- phone frame -->
+  <main class="stage">
+    <img class="bg" src="img/Background.png" alt="background grid" />
+
+    <!-- balloons (we'll clone via CSS variables to get 8 clusters) -->
+    <div class="balloons">
+      <img src="img/ballon.png" class="balloon" style="--x:8%;  --d:0.1s;" alt="">
+      <img src="img/ballon.png" class="balloon" style="--x:78%; --d:0.3s;" alt="">
+      <img src="img/ballon.png" class="balloon" style="--x:14%; --d:0.6s;" alt="">
+      <img src="img/ballon.png" class="balloon" style="--x:74%; --d:0.9s;" alt="">
+      <img src="img/ballon.png" class="balloon" style="--x:10%; --d:1.2s;" alt="">
+      <img src="img/ballon.png" class="balloon" style="--x:70%; --d:1.4s;" alt="">
+      <img src="img/ballon.png" class="balloon" style="--x:12%; --d:1.7s;" alt="">
+      <img src="img/ballon.png" class="balloon" style="--x:76%; --d:2.0s;" alt="">
+    </div>
+
+    <!-- text images -->
+    <div class="title-stack">
+      <img src="img/Happy.png" class="title-img title-happy" alt="Happy" />
+
+    </div>
+    <div class="title-stack2">
+      <img src="img/Birth.png" class="title-img title-birth" alt="Birth" />
+    </div>
+    <div class="title-stack3">
+
+      <img src="img/Day.png"   class="title-img title-day"   alt="Day" />
+    </div>
+
+    <!-- name -->
+    <img src="img/Anosa.png" class="name-img" alt="ANOSA" />
+
+    <!-- cake block (your component) -->
+    <section class="cake-block">
+      <!-- cake -->
+      <div id="cake-container">
+        <img id="cake-svg-img" src="img/cake4.png" alt="Birthday Cake" />
+        <canvas id="cake-candle-canvas"></canvas>
+      </div>
+    
+      <!-- centered card that shows AFTER the blow -->
+      <div class="greeting-card" id="greeting-card">
+        <div id="lottie-confetti" style="width:320px;max-width:90vw;margin:0 auto;"></div>
+    
+        <!-- ⭐ Put YOUR text here -->
+        <div id="congrats-message" style="display:none;">
+          <h3 class="gc-title">💜Happy Birthday Anosty💜</h3>
+          <p class="gc-text">
+            I pray this tiring year passes quickly and you barely feel it,
+            <br><br>
+            and that the years ahead start looking brighter on your face because you truly deserve it.
+            <br><br>
+            I love you so, so much, and I’m always by your side, whether things are good or not.
+          </p>
+          <p class="gc-text">
+            You’ll always find me next to you, supporting you and wishing you the best every day.
+            <br><br>
+            Even if things get worse, come into my arms I’ll always welcome you, my lover.💜🎈 
+          </p>
+        </div>
+    
+        <div id="celebrate-message" style="display:none;">
+          I Love You Anosty💜
+          <audio id="birthday-audio" src="audio/birthday.mp3" preload="auto" loop></audio>
+        </div>
+      </div>
+    
+      <!-- controls under the cake -->
+      <p class="wish-line">First, make a wish. Then say:</p>
+      <h2 class="wish-say">“Happy birthday to Anoosa!” and blow in the Mic!</h2>
+      <button class="btn-main" id="blow-instruction">Blow out the candle!</button>
+    </section>
+    
+  </main>
+
+  <!-- libs + scripts -->
+  <script src="https://unpkg.com/lottie-web@5.12.2/build/player/lottie.min.js"></script>
+  <script src="js/candle_on_cake.js"></script>
+  <script src="js/main.js"></script>
+</body>
+</html>

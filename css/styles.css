@@ -1,0 +1,355 @@
+/* =========================================================
+   Global Reset & Base
+========================================================= */
+* { box-sizing: border-box; }
+html, body { height: 100%; }
+body {
+  margin: 0;
+  background:#0f1115;                /* outer area around phone */
+  color:#0b2a3d;
+  font-family: ui-rounded, "SF Pro Rounded", system-ui, -apple-system,
+               Segoe UI, Roboto, Arial, sans-serif;
+  -webkit-font-smoothing: antialiased;
+}
+
+/* =========================================================
+   One-time Start Overlay (unlocks audio/mic on iOS)
+========================================================= */
+.overlay{
+  position:fixed; inset:0; z-index:50;
+  display:grid; place-items:center;
+  border:0; background: radial-gradient(1200px 800px at 50% 50%, #17202a, #0f1115);
+  color:#e8f1ff; cursor:pointer;
+}
+.overlay:focus{ outline:0; }
+.overlay-inner{ text-align:center; padding:24px; }
+.overlay .emoji{ font-size:34px; opacity:.9; }
+.overlay .headline{ margin-top:10px; font-weight:800; letter-spacing:.2px; }
+.overlay .sub{ margin-top:6px; opacity:.8; font-size:14px; }
+.overlay.hide{ animation: fadeOut .5s ease forwards; }
+@keyframes fadeOut{ to{ opacity:0; visibility:hidden; } }
+
+/* =========================================================
+   Phone Stage (iPhone-like frame)
+========================================================= */
+.stage{
+  position:relative;
+  width:min(430px, 90vw);       /* iPhone 16-ish width */
+  aspect-ratio:430 / 932;       /* tall phone */
+  margin:4vh auto;
+  border-radius:36px;
+  overflow:hidden;
+  background:#cfeaff;
+  box-shadow:
+    0 6px 24px rgba(0,0,0,.35),
+    inset 0 0 0 6px #1dc3c6,
+    inset 0 0 0 10px #11181f;
+}
+.bg{
+  position:absolute; inset:0;
+  width:100%; height:100%;
+  object-fit:cover; object-position:center;
+  opacity:.95;
+}
+
+/* =========================================================
+   Balloons (random across screen → rise → float)
+========================================================= */
+.balloons{ position:absolute; inset:0; pointer-events:none; overflow:visible; }
+.balloon{
+  position:absolute;
+  left:var(--x, 10%);           /* set by JS */
+  width:var(--w, 22%);          /* size variety */
+  bottom:-35%;
+  opacity:0;
+  transform: translateY(40px) scale(var(--s, .98)) rotate(var(--r, 0deg));
+  filter: drop-shadow(0 16px 20px rgba(20,40,80,.15));
+}
+.stage.started .balloon{
+  animation:
+    rise 7s cubic-bezier(.18,.77,.26,.99) var(--d,0s) forwards,
+    floaty 5.5s ease-in-out calc(var(--d,0s) + 3s) infinite alternate;
+}
+@keyframes rise{
+  0%   { transform: translateY(40px) scale(var(--s,.98)) rotate(var(--r,0deg)); opacity:0; }
+  10%  { opacity:1; }
+  100% { transform: translateY(-115%) scale(var(--s,1)) rotate(var(--r,0deg)); opacity:1; }
+}
+@keyframes floaty{
+  from { transform: translateY(-115%) translateX(-6px) rotate(var(--r,0deg)); }
+  to   { transform: translateY(calc(-115% - 10px)) translateX(6px) rotate(var(--r,0deg)); }
+}
+
+/* =========================================================
+   Titles & Name
+========================================================= */
+.title-stack{
+  position:absolute; top:4%; left:50%;
+  transform: translateX(-75%);
+  width:54%; text-align:center;
+}
+.title-stack2{
+  position:absolute; top:10%; left:50%;
+  transform: translateX(-40%);
+  width:54%; text-align:center;
+}
+.title-stack3{
+  position:absolute; top:14%; left:50%;
+  transform: translateX(-20%);
+  width:54%; text-align:center;
+}
+.title-img{ width:100%; opacity:0; transform: translateY(8px) scale(.98); }
+.stage.show-titles .title-happy{ animation: fadeUp .7s ease forwards; }
+.stage.show-titles .title-birth{ animation: fadeUp .7s ease .25s forwards; }
+.stage.show-titles .title-day  { animation: fadeUp .7s ease .5s forwards; }
+@keyframes fadeUp{ to{ opacity:1; transform: translateY(0) scale(1); } }
+
+.name-img{
+  position:absolute; bottom:6%; left:50%;
+  transform: translateX(-50%) scale(.98);
+  width:58%; opacity:0;
+}
+.stage.show-name .name-img{ animation: pop .6s cubic-bezier(.2,1,.2,1) forwards; }
+@keyframes pop{
+  60%{ transform: translateX(-50%) scale(1.06); opacity:.9; }
+  100%{ transform: translateX(-50%) scale(1); opacity:1; }
+}
+
+/* fade away titles + name after 30s */
+.stage.hide-titles .title-img,
+.stage.hide-titles .name-img{
+  animation: none !important;
+  transition: opacity .8s ease, transform .8s ease;
+  opacity: 0;
+  transform: translateY(-6px) scale(.98);
+}
+
+/* =========================================================
+   Cake Block (smaller; button under it; then text)
+========================================================= */
+.cake-block{
+  position:absolute; left:50%; top:56%;
+  transform: translate(-50%,-50%) translateY(16px) scale(.96);
+  width:98%; opacity:0; pointer-events:none;
+  display:flex; flex-direction:column; align-items:center; gap:10px;
+}
+.stage.show-cake .cake-block{
+  animation: dropIn .7s cubic-bezier(.2,1,.2,1) forwards;
+  pointer-events:auto;
+}
+@keyframes dropIn{
+  to{ transform: translate(-50%,-50%) translateY(0) scale(1); opacity:1; }
+}
+
+/* Cake Container (reduced size) */
+#cake-container{
+  position:relative;
+  width:100%;
+  max-width:560px;              /* smaller cake */
+  margin:0 auto;
+}
+#cake-svg-img{
+  width:100%;
+  height:auto;
+  display:block;
+  filter: drop-shadow(0 10px 20px rgba(0,0,0,0.28));
+  z-index:1;
+}
+
+/* Candle */
+#cake-candle-canvas{
+  position:absolute; left:50%; top:-70px; transform:translate(-50%, 60%);
+  width:84px; height:118px; z-index:2; background:transparent;
+  filter:
+    drop-shadow(0 0 15px rgba(255,237,133,.7))
+    drop-shadow(0 0 30px rgba(255,213,0,.5));
+  transition: all .3s ease;
+}
+#cake-candle-canvas.candle-off{ filter:none; opacity:.85; }
+
+/* Messages & Buttons */
+#congrats-message{
+  font-size:1.05rem; 
+  color:#0a3a56; 
+  font-weight:700; 
+  text-align:center;
+  background:rgba(255,255,255,.85); 
+  border-radius:14px; 
+  padding:10px 14px;
+  margin:4px 0 0; 
+  animation: subtleGlow 2s ease-in-out infinite alternate;
+}
+#celebrate-message{
+  font-size:0.8rem; 
+  color:#1d1756; 
+  font-weight:600; 
+  text-align:center;
+  margin:6px 0 0;
+  background:rgba(255,255,255,.92); 
+  border-radius:12px; 
+  padding:8px 12px;
+  display:none; 
+  animation: popIn .6s cubic-bezier(.68,-0.55,.27,1.55),
+                          float 3s ease-in-out infinite;
+}
+.btn-main{
+  background:linear-gradient(135deg,#477cd8 0%,#031932 100%);
+  color:#fff; 
+  border:0; 
+  border-radius:28px; 
+  padding:10px 22px;
+  font-weight:700; 
+  cursor:pointer; 
+  box-shadow:0 6px 16px rgba(221, 159, 247, 0.35);
+  margin-top:4px;
+}
+.btn-secondary{
+  background:linear-gradient(135deg,#477cd8 0%,#031932 100%);
+  color:#fff; 
+  border:0; 
+  border-radius:28px; 
+  padding:9px 18px; 
+  cursor:pointer;
+  box-shadow:0 6px 16px rgba(221, 159, 247, 0.35);
+  display:none;
+}
+.wish-line, .wish-say{ text-align:center; color:#0b2a3d; margin:2px 0 0; }
+.wish-say{ color:#0a5a8a; }
+
+/* =========================================================
+   Animations (shared)
+========================================================= */
+@keyframes popIn{
+  0%{ transform:scale(.5); opacity:0; }
+  70%{ transform:scale(1.1); }
+  100%{ transform:scale(1); opacity:1; }
+}
+@keyframes subtleGlow{
+  from{ box-shadow:0 0 0 rgba(255,224,130,0); }
+  to  { box-shadow:0 0 24px rgba(255,224,130,.45); }
+}
+@keyframes float{ 0%,100%{ transform:translateY(0);} 50%{ transform:translateY(-5px);} }
+
+/* =========================================================
+   Responsive Tweaks
+========================================================= */
+@media (max-width:520px){
+  .stage{ width:92vw; }
+  .cake-block{ width:86%; top:57%; }
+  #cake-container{ max-width:320px; }
+  #cake-candle-canvas{ top:-52px; width:78px; height:112px; }
+  .title-stack{ top:15%; width:86%; }
+  .name-img{ width:60%; }
+}
+
+@media (min-width:1024px){
+  #cake-candle-canvas{
+    top:-70px; width:96px; height:136px;
+    filter:
+      drop-shadow(0 0 20px rgba(255,237,133,.8))
+      drop-shadow(0 0 40px rgba(255,213,0,.6));
+  }
+}
+
+/* =========================================================
+   (Optional) Utility: Hide scrollbars on iOS inside phone
+========================================================= */
+.stage::-webkit-scrollbar{ display:none; }
+
+
+/* ----- Centered greeting card ----- */
+.greeting-card{
+  position:absolute;
+  left:50%;
+  top:54%;
+  transform: translate(-50%,-50%) scale(.92);
+  width:88%;
+  max-width:520px;
+  z-index:30;
+  opacity:0;
+  pointer-events:none;
+  transition: opacity .45s ease, transform .45s ease;
+}
+
+/* when either the JS adds .show (your current code) OR we are in post-blow state */
+.greeting-card.show,
+.stage.post-blow .greeting-card{
+  opacity:1;
+  transform: translate(-50%,-50%) scale(1);
+  pointer-events:auto;
+}
+
+/* ----- Hide cake & controls after blow ----- */
+.stage.post-blow #cake-container,
+.stage.post-blow #cake-candle-canvas,
+.stage.post-blow .btn-main,
+.stage.post-blow .wish-line,
+.stage.post-blow .wish-say{
+  opacity:0;
+  transform: translateY(-8px) scale(.98);
+  transition: opacity .35s ease, transform .35s ease;
+  pointer-events:none;
+}
+
+/* Optional: also fade out the name to keep the focus on the message */
+.stage.post-blow .name-img{
+  opacity:0;
+  transform: translateY(10px) scale(.98);
+  transition: opacity .35s ease, transform .35s ease;
+}
+
+
+/* Card styling for your custom text */
+.gc-title{
+  margin: 6px 0 4px;
+  text-align:center;
+  font-size:1.20rem;
+  color:#0a4a72;
+  font-weight:600;
+}
+.gc-text{
+  margin: 6px 0;
+  text-align:center;
+  font-size:1.05rem;
+  color:#08334f;
+}
+
+/* Centered greeting card (already in your file, kept here for clarity) */
+.greeting-card{
+  position:absolute;
+  left:50%;
+  top:-30%;
+  transform: translate(-50%,-50%) scale(.92);
+  width:88%;
+  max-width:420px;
+  z-index:30;
+  opacity:0;
+  pointer-events:none;
+  transition: opacity .45s ease, transform .45s ease;
+}
+.greeting-card.show,
+.stage.post-blow .greeting-card{
+  opacity:1;
+  transform: translate(-50%,-50%) scale(1);
+  pointer-events:auto;
+}
+
+/* 🔧 IMPORTANT: only fade the cake image/candle and controls, NOT #cake-container */
+.stage.post-blow #cake-svg-img,
+.stage.post-blow #cake-candle-canvas,
+.stage.post-blow .btn-main,
+.stage.post-blow .wish-line,
+.stage.post-blow .wish-say{
+  opacity:0;
+  transform: translateY(-8px) scale(.98);
+  transition: opacity .35s ease, transform .35s ease;
+  pointer-events:none;
+}
+
+/* (optional) also fade out top titles & name after blow */
+.stage.post-blow .title-img,
+.stage.post-blow .name-img{
+  opacity:0;
+  transform: translateY(-6px) scale(.98);
+  transition: opacity .35s ease, transform .35s ease;
+}
